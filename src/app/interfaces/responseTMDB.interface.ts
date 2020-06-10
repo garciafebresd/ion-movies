@@ -2,7 +2,7 @@ export interface ResponseTMDB {
   page: number;
   total_results: number;
   total_pages: number;
-  results: Result[];
+  results: Movies[];
 }
 
 export interface Movies {

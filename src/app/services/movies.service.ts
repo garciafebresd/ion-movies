@@ -11,10 +11,38 @@ const apiKey = environment.apiKey;
 })
 export class MoviesService {
 
+  dateFrom: string;
+  dateTo: string;
+
   constructor(private http: HttpClient) { }
 
-  getFeature(){
-    const urlQuery = `/discover/movie?primary_release_date.gte=2014-09-15&primary_release_date.lte=2014-10-22&api_key=${apiKey}`;
-    return this.http.get<ResponseTMDB>(`${baseUrl}${urlQuery}`);
+  calculateDates(){
+    const today = new Date();
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    const month = today.getMonth() + 1;
+
+    let monthString;
+    if (month < 10) {
+      monthString = '0' + month;
+    } else {
+      monthString = month;
+    }
+
+    this.dateFrom = `${today.getFullYear()}-${monthString}-01`;
+    this.dateTo = `${today.getFullYear()}-${monthString}-${lastDay}`;
+  }
+
+  private executeQuery<T>(query: string) {
+    query = baseUrl + query;
+    query += `&api_key=${apiKey}`;
+    return this.http.get<T>(query);
+  }
+
+  getFeature() {
+
+    this.calculateDates();
+
+    const urlQuery = `/discover/movie?primary_release_date.gte=${this.dateFrom}&primary_release_date.lte=${this.dateTo}`;
+    return this.executeQuery<ResponseTMDB>(urlQuery);
   }
 }
